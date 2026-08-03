@@ -10,8 +10,14 @@ but no sample domain.
 You need Node.js `24.18.0` (or a later Node 24 release), Corepack with pnpm
 `11.18.0`, Docker Engine `24.0.0+`, and Docker Compose `2.20.0+`.
 
-1. Create a repository from this template, or copy its files into an empty
-   repository. The new root should contain `pnpm-workspace.yaml`.
+1. Scaffold a project with [`degit`](https://github.com/Rich-Harris/degit), or
+   copy this starter into an empty repository:
+
+   ```sh
+   npx degit https://github.com/timtheone/fastify-tanstackstart-monorepo-starter my-app
+   cd my-app
+   ```
+
 2. Run `corepack enable`, then confirm `pnpm --version` prints `11.18.0`.
 3. Deliberately create your local configuration with
    `cp .env.example .env`. Replace the example Better Auth secret and adjust

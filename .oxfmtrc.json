@@ -1,0 +1,7 @@
+{
+  "ignorePatterns": [
+    "packages/api-client/src/generated/**",
+    "packages/api-client/openapi/openapi.json",
+    "apps/web/src/routeTree.gen.ts"
+  ]
+}

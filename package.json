@@ -1,0 +1,38 @@
+{
+  "name": "fastify-tanstackstart-monorepo-starter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev --filter=@repo/api --filter=@repo/web",
+    "build": "turbo run build",
+    "preview": "NODE_ENV=production turbo run preview --filter=@repo/api --filter=@repo/web",
+    "format": "oxfmt --write .",
+    "lint": "oxlint --deny-warnings .",
+    "typecheck": "turbo run typecheck",
+    "test": "NODE_OPTIONS=--conditions=source vitest run --config vitest.config.ts",
+    "test:integration": "NODE_OPTIONS=--conditions=source vitest run --config vitest.integration.config.ts",
+    "test:e2e": "node --conditions=source --import tsx scripts/test/run-e2e.ts",
+    "db:generate": "pnpm --filter @repo/db db:generate",
+    "db:migrate": "pnpm --filter @repo/db db:migrate",
+    "gen:openapi": "orval"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@repo/db": "workspace:*",
+    "@testcontainers/postgresql": "catalog:",
+    "@types/node": "catalog:",
+    "drizzle-orm": "catalog:",
+    "orval": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "tsx": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.18.0 <25",
+    "pnpm": "11.18.0"
+  },
+  "packageManager": "pnpm@11.18.0"
+}

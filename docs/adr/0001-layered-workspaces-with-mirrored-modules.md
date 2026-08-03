@@ -1,0 +1,3 @@
+# Layered workspaces with mirrored Modules
+
+The modular monorepo Template uses stable technical workspaces for the API, web application, contracts, database, application logic, and generated client, while organizing domain code inside each relevant workspace under consistently named Modules. Private workspaces retain the neutral `@repo/*` namespace after scaffolding rather than requiring a project-wide package or import rename. This keeps browser, server, database, and code-generation responsibilities explicit and avoids package-per-Module overhead, while mirrored names preserve navigability and ownership across layers; the accepted cost is that a Module change can span several workspaces.

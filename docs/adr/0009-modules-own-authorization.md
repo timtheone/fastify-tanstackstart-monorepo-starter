@@ -1,0 +1,3 @@
+# Modules own authorization
+
+Fastify performs the coarse authentication check and passes an Authenticated Identity into protected application operations, while each Module owns the fine-grained Authorization Rules for its behavior and resources. The Template provides this identity-passing seam and a typed authorization Application Failure that maps to HTTP `403`, but it does not ship roles, permission tables, or a generic RBAC framework. Keeping authorization with the application operation makes the same rules apply through HTTP, jobs, CLIs, and future adapters, while allowing each generated project to choose RBAC, ownership, membership, entitlements, or a combination based on its actual domain.

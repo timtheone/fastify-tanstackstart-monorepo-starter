@@ -1,0 +1,3 @@
+# The application layer is transport-agnostic
+
+The `packages/application` workspace expresses expected failures in each Module's product language and never constructs HTTP status codes, Fastify replies, or Problem Details. Application Failures are typed `Error` subclasses thrown by application operations; the central Fastify error handler recognizes them and owns their mapping to declared HTTP responses. This preserves use-case reuse from tests, jobs, CLIs, and future non-HTTP adapters while avoiding Result-union branching at every caller. The accepted cost is that TypeScript function signatures do not declare thrown error types, so each operation's expected failures must remain explicit in its interface documentation and tests.

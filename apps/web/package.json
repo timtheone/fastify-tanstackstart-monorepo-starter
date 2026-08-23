@@ -16,6 +16,7 @@
     "@repo/api-client": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
+    "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
     "better-auth": "catalog:",
     "class-variance-authority": "catalog:",

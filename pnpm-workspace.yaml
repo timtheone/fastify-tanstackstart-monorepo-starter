@@ -16,6 +16,7 @@ catalog:
   "@tailwindcss/vite": 4.3.3
   "@tanstack/react-query": 5.101.4
   "@tanstack/react-router": 1.170.18
+  "@tanstack/react-router-ssr-query": 1.167.1
   "@tanstack/react-start": 1.168.34
   "@testcontainers/postgresql": 12.0.4
   "@types/node": 24.10.2
@@ -32,7 +33,7 @@ catalog:
   fastify-plugin: 6.0.0
   http-proxy-3: 1.23.3
   nitro: 3.0.260610-beta
-  orval: 8.23.0
+  orval: 8.25.0
   oxfmt: 0.61.0
   oxlint: 1.76.0
   pg: 8.22.0

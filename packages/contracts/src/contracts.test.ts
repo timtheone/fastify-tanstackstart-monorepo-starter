@@ -1,6 +1,6 @@
 import { Check } from "typebox/value";
 import { describe, expect, it } from "vitest";
-import { ProblemDetails, SessionResponse } from "./index.js";
+import { ProblemDetails } from "./index.js";
 
 describe("HTTP contracts", () => {
   it("accepts RFC 9457 validation problems and rejects arbitrary error envelopes", () => {
@@ -16,20 +16,5 @@ describe("HTTP contracts", () => {
       }),
     ).toBe(true);
     expect(Check(ProblemDetails, { error: "bad request" })).toBe(false);
-  });
-
-  it("exposes only the application session projection", () => {
-    expect(
-      Check(SessionResponse, {
-        identity: { userId: "user-1", sessionId: "session-1" },
-        user: { id: "user-1", email: "person@example.com", name: "Person" },
-      }),
-    ).toBe(true);
-    expect(
-      Check(SessionResponse, {
-        identity: { userId: "user-1", sessionId: "session-1", token: "secret" },
-        user: { id: "user-1", email: "person@example.com", name: "Person" },
-      }),
-    ).toBe(false);
   });
 });

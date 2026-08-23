@@ -22,6 +22,17 @@ Fastify uses `@fastify/swagger` in dynamic mode and mounts `@fastify/swagger-ui`
 
 The Template does not add a second custom OpenAPI route.
 
+The committed Orval configuration uses the `react-query` client with Fetch.
+Leave query and mutation generation enabled by default: GET operations produce
+query functions and hooks, while non-GET operations produce mutation functions
+and hooks. Disable a wrapper only for a specific operation when there is a
+concrete reason. `serializeResponseHeaders` keeps generated response envelopes
+safe for TanStack Start dehydration, and `useRuntimeFetcher` lets server-side
+loaders provide a Fetch implementation that forwards the incoming cookie.
+Server loaders call generated request functions; browser components call the
+generated hooks. Do not add handwritten API query keys, JSON adapters, or
+generic mutation wrappers.
+
 The Better Auth Drizzle schema is committed project-owned source. Database
 migrations include its tables and are applied with `pnpm db:migrate`.
 

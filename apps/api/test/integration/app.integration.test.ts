@@ -20,7 +20,7 @@ afterEach(async () => {
 });
 
 describe("assembled Fastify application", () => {
-  it("serves health signals and a database-backed email/password session", async () => {
+  it("serves health signals and Better Auth email/password sessions", async () => {
     const instance = await buildApp({
       config: {
         host: "127.0.0.1",
@@ -40,14 +40,6 @@ describe("assembled Fastify application", () => {
 
     const ready = await instance.inject({ method: "GET", url: "/health/ready" });
     expect(ready.statusCode).toBe(200);
-
-    const anonymous = await instance.inject({ method: "GET", url: "/api/session" });
-    expect(anonymous.statusCode).toBe(401);
-    expect(anonymous.headers["content-type"]).toContain("application/problem+json");
-    expect(anonymous.json()).toMatchObject({
-      type: "https://starter.invalid/problems/authentication-required",
-      status: 401,
-    });
 
     const missing = await instance.inject({ method: "GET", url: "/api/missing" });
     expect(missing.statusCode).toBe(404);
@@ -71,12 +63,12 @@ describe("assembled Fastify application", () => {
 
     const session = await instance.inject({
       method: "GET",
-      url: "/api/session",
+      url: "/api/auth/get-session",
       headers: { cookie },
     });
     expect(session.statusCode).toBe(200);
     expect(session.json()).toMatchObject({
-      identity: { userId: expect.any(String), sessionId: expect.any(String) },
+      session: { userId: expect.any(String) },
       user: { email: "person@example.com", name: "Person" },
     });
   });

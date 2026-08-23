@@ -9,7 +9,6 @@ import { authPlugin } from "./plugins/auth.js";
 import { databasePlugin } from "./plugins/database.js";
 import { installProblemDetails } from "./problem-details.js";
 import { healthRoutes } from "./routes/health.js";
-import { sessionRoutes } from "./routes/session.js";
 
 export type BuildAppOptions = Readonly<{
   config: ApiConfig;
@@ -68,7 +67,6 @@ export async function buildApp(options: BuildAppOptions) {
   await app.register(databasePlugin, { databaseUrl: options.config.databaseUrl });
   await app.register(authPlugin, { config: options.config });
   await app.register(healthRoutes);
-  await app.register(sessionRoutes);
   await app.ready();
 
   return app;

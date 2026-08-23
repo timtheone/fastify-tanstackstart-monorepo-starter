@@ -1,5 +1,6 @@
-import type { SessionResponseBody } from "@repo/contracts";
+import type { AuthenticatedIdentity } from "@repo/application";
 import { fromNodeHeaders } from "better-auth/node";
+import type { FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 import type { IncomingHttpHeaders } from "node:http";
 import { createAuth, type Auth } from "../auth.js";
@@ -13,6 +14,11 @@ export const authPlugin = fp<{ config: ApiConfig }>(
   async function authPlugin(app, { config }) {
     const auth = createAuth(app.database, config);
     app.decorate("auth", auth);
+    app.decorate("authenticate", async (request: FastifyRequest) => {
+      const identity = await readIdentity(auth, request.headers);
+      if (!identity) throw new AuthenticationRequiredError("Authentication is required");
+      return identity;
+    });
 
     app.route({
       method: ["GET", "POST"],
@@ -29,7 +35,8 @@ export const authPlugin = fp<{ config: ApiConfig }>(
 
         reply.status(response.status);
         response.headers.forEach((value, key) => reply.header(key, value));
-        reply.header("set-cookie", response.headers.getSetCookie());
+        const setCookies = response.headers.getSetCookie();
+        if (setCookies.length > 0) reply.header("set-cookie", setCookies);
         return reply.send(response.body ? await response.text() : null);
       },
     });
@@ -37,28 +44,19 @@ export const authPlugin = fp<{ config: ApiConfig }>(
   { name: "auth", dependencies: ["database"] },
 );
 
-export async function readSession(
+export async function readIdentity(
   auth: Auth,
   headers: IncomingHttpHeaders,
-): Promise<SessionResponseBody | null> {
+): Promise<AuthenticatedIdentity | null> {
   const session = await auth.api.getSession({ headers: fromNodeHeaders(headers) });
   if (!session) return null;
 
-  return {
-    identity: {
-      userId: session.user.id,
-      sessionId: session.session.id,
-    },
-    user: {
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-    },
-  };
+  return { userId: session.user.id, sessionId: session.session.id };
 }
 
 declare module "fastify" {
   interface FastifyInstance {
     auth: Auth;
+    authenticate(request: FastifyRequest): Promise<AuthenticatedIdentity>;
   }
 }

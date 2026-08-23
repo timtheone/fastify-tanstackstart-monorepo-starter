@@ -1,5 +1,6 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { routeTree } from "./routeTree.gen";
 
 export type RouterContext = Readonly<{
@@ -8,15 +9,23 @@ export type RouterContext = Readonly<{
 
 let browserQueryClient: QueryClient | undefined;
 
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: 60_000 },
+    },
+  });
+}
+
 function getQueryClient() {
-  if (typeof window === "undefined") return new QueryClient();
-  browserQueryClient ??= new QueryClient();
+  if (isServer) return createQueryClient();
+  browserQueryClient ??= createQueryClient();
   return browserQueryClient;
 }
 
 export function getRouter() {
   const queryClient = getQueryClient();
-  return createRouter({
+  const router = createRouter({
     routeTree,
     context: { queryClient },
     defaultPreload: "intent",
@@ -25,4 +34,7 @@ export function getRouter() {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
   });
+
+  setupRouterSsrQueryIntegration({ router, queryClient, wrapQueryClient: false });
+  return router;
 }

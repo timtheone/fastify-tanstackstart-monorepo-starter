@@ -21,6 +21,22 @@ web-server or ingress layer; TanStack Start does not own an application proxy
 route. Keep credentials and response headers intact when configuring that
 infrastructure because Better Auth depends on its `Set-Cookie` response.
 
+## TanStack Query and SSR
+
+`apps/web/src/router.tsx` owns the QueryClient lifecycle. Create one client per
+SSR request and reuse one browser singleton, configure shared query defaults
+there, and install `@tanstack/react-router-ssr-query` for dehydration and
+hydration. Route loaders prefetch route-critical data with
+`context.queryClient.ensureQueryData(...)`; components read that cache through
+the generated Orval hook using the same generated query key.
+
+When a server loader calls a First-Party API, use the generated Fetch function
+through a TanStack Start server function and inject the server-only Fetch
+adapter from `apps/web/src/server/api-fetch.server.ts`. That adapter forwards
+the incoming cookie and resolves the internal API origin. Do not fetch API data
+in `useEffect`, bridge loader results with `initialData`, or pass native
+`Headers` objects through server functions or the dehydrated cache.
+
 ## shadcn
 
 Commit `apps/web/components.json` and keep it valid against the official

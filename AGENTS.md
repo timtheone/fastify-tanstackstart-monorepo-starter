@@ -15,6 +15,33 @@ keep environment reads in composition roots, and call public package or Module
 interfaces directly. The [architecture decisions](docs/README.md#architecture-decisions)
 are authoritative.
 
+## Web data, generated API clients, and authentication
+
+- `orval.config.ts` is the source of truth. Keep Fetch functions and React Query
+  integrations enabled by default; disable only a specific operation for a real
+  reason. Never hand-edit `packages/api-client/src/generated/**`; run
+  `pnpm gen:openapi` after API contract changes.
+- Server loaders call generated request functions through server functions when
+  they must forward the incoming cookie. Browser components use generated
+  `use...` hooks. Use generated query-key factories for OpenAPI data; do not add
+  handwritten API keys, `readApiJson`-style adapters, or generic mutation hooks.
+- `apps/web/src/router.tsx` owns the QueryClient lifecycle and shared defaults.
+  Use one client per SSR request, one browser singleton, and the Router SSR Query
+  integration. Loaders use `ensureQueryData(...)`; components use the same key.
+  Do not fetch in `useEffect`, use `initialData` to bridge SSR, add client-only
+  server guards, or pass native `Headers` through dehydration.
+- Keep generated response envelopes in the cache. Generated mutations own their
+  variables and result types; use QueryClient cache updates only to keep related
+  generated entries consistent. `serializeResponseHeaders` and
+  `useRuntimeFetcher` are required for the generated SSR Fetch pattern.
+- Fastify is the only Better Auth server. The web app reads sessions through
+  Better Auth's client from a server function that forwards the request cookie;
+  do not create `/api/session` or another parallel auth protocol. A local key
+  such as `["session"]` is acceptable for this non-OpenAPI query.
+
+See [web UI](docs/reference/web-ui.md), [code generation](docs/reference/code-generation.md),
+and [ADR 0008](docs/adr/0008-fastify-owns-better-auth.md) for the detailed rationale.
+
 ## Commands and verification
 
 Use Corepack pnpm `11.18.0`; do not use npm or yarn. Supported root commands

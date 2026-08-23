@@ -24,13 +24,15 @@ Fastify-wide throttling policy, or add distributed rate-limit storage. A
 generated project chooses broader API limits and shared storage when its abuse
 model and deployment topology are known.
 
-Fastify also exposes a First-Party `GET /api/session` endpoint whose TypeBox contract returns the application's session projection. A TanStack Start server function forwards the incoming request cookie to this endpoint and maps `401 Unauthorized` to `null`; other failures remain errors. The web app wraps that function in shared TanStack Query options with a 60-second `staleTime` and five-minute `gcTime`, and route `beforeLoad` guards call `queryClient.ensureQueryData(...)`. Each guard therefore verifies that session data is available, while the freshness window avoids a network request on every navigation. Successful sign-in and sign-out flows explicitly remove or invalidate the session query so that redirects cannot observe stale authentication state.
+Fastify does not expose a parallel First-Party session endpoint. Protected API routes use an internal Fastify authentication decorator backed by `auth.api.getSession`, which returns the transport-agnostic `AuthenticatedIdentity` to the route. The web app uses Better Auth's client from a TanStack Start server function, forwards the incoming request cookie to the internal API origin, and maps an unauthenticated result to `null`. That function is wrapped in shared TanStack Query options with a five-minute `gcTime`; the global QueryClient configuration owns the default `staleTime`, and route `beforeLoad` guards call `queryClient.ensureQueryData(...)`. Successful sign-in and sign-out flows explicitly remove or invalidate the session query so redirects cannot observe stale authentication state.
 
 Better Auth's session cookie cache remains disabled. When the TanStack Query
-entry is stale or absent, `/api/session` resolves the opaque session token
-against PostgreSQL instead of accepting cached session data from a second
-cookie. This preserves immediate database-backed session revocation and keeps
-the browser query as the only intentional freshness window.
+entry is stale or absent, Better Auth resolves the opaque session token against
+PostgreSQL instead of accepting cached session data from a second cookie. This
+preserves immediate database-backed session revocation and keeps the browser
+query as the only intentional freshness window. The session query key is
+web-owned because Better Auth endpoints are outside the First-Party OpenAPI
+client; OpenAPI-backed queries must use Orval's generated key factories instead.
 
 Fastify and TanStack Start remain separate processes. Browser First-Party API clients use relative `/api/*` paths. Vite proxies those requests to `API_INTERNAL_ORIGIN` during development and local preview; production deployments provide that route through their web server or ingress instead of an application catch-all route. This separation also supports accessing the web server through a LAN or Tailscale hostname without hard-coding that hostname into the internal API address. The Template does not prescribe public hostnames, a hosting platform, or a specific production proxy.
 

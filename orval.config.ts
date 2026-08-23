@@ -24,9 +24,8 @@ export default defineConfig({
         },
         fetch: {
           forceSuccessResponse: true,
-        },
-        query: {
-          useQuery: true,
+          serializeResponseHeaders: true,
+          useRuntimeFetcher: true,
         },
       },
     },
